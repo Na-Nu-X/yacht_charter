@@ -1,0 +1,102 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+html {
+  font-family: var(--font-sans);
+  font-size: 100%;
+  line-height: 1.6;
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+.display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: inherit;
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1,
+.h1 {
+  font-size: clamp(2.5rem, 6vw, $fs-5xl);
+  font-weight: 500;
+}
+
+h2,
+.h2 {
+  font-size: clamp(2rem, 4vw, $fs-4xl);
+}
+
+h3,
+.h3 {
+  font-size: clamp(1.5rem, 2.4vw, $fs-2xl);
+}
+
+h4,
+.h4 {
+  font-size: $fs-xl;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+.lead {
+  font-size: clamp($fs-md, 1.6vw, $fs-lg);
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+
+.eyebrow {
+  @include eyebrow;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-3;
+
+  &::before {
+    @include horizon-rule(28px);
+  }
+
+  &--plain::before {
+    display: none;
+  }
+
+  &--light {
+    color: var(--color-brass-light);
+  }
+}
+
+.serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.tabular,
+.price,
+.spec-value {
+  @include tabular;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-brass {
+  color: var(--color-brass);
+}
+
+small,
+.small {
+  font-size: $fs-sm;
+}

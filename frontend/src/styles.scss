@@ -1,0 +1,7 @@
+// Global entry point for the Riviera Maritime design system.
+// Order matters: tokens → base → typography → layout → shared components.
+@use 'styles/variables';
+@use 'styles/base';
+@use 'styles/typography';
+@use 'styles/layout';
+@use 'styles/components';

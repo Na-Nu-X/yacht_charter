@@ -1,0 +1,131 @@
+// =============================================================================
+// Riviera Maritime design tokens
+// -----------------------------------------------------------------------------
+// SCSS variables are the source of truth at build time; every token is also
+// exposed as a CSS custom property on :root (see `_base.scss`) so a white-label
+// client can be rebranded at runtime via `site.config.ts → theme`.
+// =============================================================================
+
+// --- Palette -----------------------------------------------------------------
+$sail-white: #fafbfd;
+$limestone: #f3f0ea;
+$limestone-deep: #ebe5da;
+$pure-white: #ffffff;
+$border: #e2e8f0;
+$border-strong: #cbd5e1;
+
+$midnight-navy: #0b1d33;
+$midnight-navy-2: #10243d;
+$adriatic-navy: #102a43;
+$adriatic-hover: #1e3a5f;
+$adriatic-bright: #1d4ed8;
+
+$slate-900: #0f172a;
+$slate-600: #475569;
+$slate-500: #64748b;
+$slate-400: #94a3b8;
+
+$brass: #b68d40;
+$brass-hover: #9c7633;
+$brass-light: #d9bf86;
+$brass-soft: rgba(182, 141, 64, 0.12);
+
+$success: #2f7d5b;
+$success-soft: #e6f2ec;
+$danger: #b42318;
+$danger-soft: #fdecea;
+$info: #1e3a8a;
+$info-soft: #e8eefb;
+
+// --- Typography --------------------------------------------------------------
+$font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
+$font-sans: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+$fs-xs: 0.75rem;
+$fs-sm: 0.875rem;
+$fs-base: 1rem;
+$fs-md: 1.125rem;
+$fs-lg: 1.25rem;
+$fs-xl: 1.5rem;
+$fs-2xl: 2rem;
+$fs-3xl: 2.5rem;
+$fs-4xl: 3.25rem;
+$fs-5xl: 4.25rem;
+
+// --- Spacing, radii, shadows -------------------------------------------------
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-5: 1.5rem;
+$space-6: 2rem;
+$space-7: 3rem;
+$space-8: 4rem;
+$space-9: 6rem;
+$space-10: 8rem;
+
+$radius-sm: 4px;
+$radius: 8px;
+$radius-lg: 14px;
+$radius-pill: 999px;
+
+$shadow-sm: 0 1px 2px rgba(11, 29, 51, 0.06);
+$shadow: 0 6px 24px -8px rgba(11, 29, 51, 0.14);
+$shadow-lg: 0 24px 60px -20px rgba(11, 29, 51, 0.28);
+
+// --- Layout ------------------------------------------------------------------
+$container-max: 1240px;
+$container-narrow: 860px;
+$gutter: 1rem;
+$gutter-lg: 2rem;
+$navbar-height: 76px;
+
+$breakpoints: (
+  sm: 640px,
+  md: 768px,
+  lg: 1024px,
+  xl: 1280px,
+);
+
+// --- Motion ------------------------------------------------------------------
+$ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+$duration: 240ms;
+$duration-slow: 700ms;
+
+// --- Custom-property map (emitted on :root) ---------------------------------
+$theme-tokens: (
+  'color-bg': $sail-white,
+  'color-surface-warm': $limestone,
+  'color-surface-warm-deep': $limestone-deep,
+  'color-surface': $pure-white,
+  'color-border': $border,
+  'color-border-strong': $border-strong,
+  'color-navy-deep': $midnight-navy,
+  'color-navy-deep-2': $midnight-navy-2,
+  'color-text': $slate-900,
+  'color-text-muted': $slate-600,
+  'color-text-subtle': $slate-500,
+  'color-accent': $adriatic-navy,
+  'color-accent-hover': $adriatic-hover,
+  'color-accent-bright': $adriatic-bright,
+  'color-brass': $brass,
+  'color-brass-hover': $brass-hover,
+  'color-brass-light': $brass-light,
+  'color-brass-soft': $brass-soft,
+  'color-success': $success,
+  'color-success-soft': $success-soft,
+  'color-danger': $danger,
+  'color-danger-soft': $danger-soft,
+  'color-info': $info,
+  'color-info-soft': $info-soft,
+  'font-serif': $font-serif,
+  'font-sans': $font-sans,
+  'radius-sm': $radius-sm,
+  'radius': $radius,
+  'radius-lg': $radius-lg,
+  'shadow-sm': $shadow-sm,
+  'shadow': $shadow,
+  'shadow-lg': $shadow-lg,
+  'navbar-height': $navbar-height,
+  'ease-out': $ease-out,
+);
