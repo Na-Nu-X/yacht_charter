@@ -2,4 +2,6 @@ from django.apps import AppConfig
 
 
 class CharterConfig(AppConfig):
-    name = 'charter'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "charter"
+    verbose_name = "Charter a flotila"
