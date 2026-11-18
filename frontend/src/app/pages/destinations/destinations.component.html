@@ -1,0 +1,133 @@
+<section class="page-header">
+  <div class="page-header__bg" aria-hidden="true">
+    <img [src]="config.imagery.destinationsHeader" alt="" />
+  </div>
+  <div class="container page-header__inner">
+    <nav class="breadcrumbs" aria-label="Omrvinková navigácia">
+      <a routerLink="/">Domov</a><span aria-hidden="true">/</span><span>Destinácie</span>
+    </nav>
+    <h1>Destinácie a maríny</h1>
+    <p class="lead">
+      Kurátorovaný sprievodca najkrajšími jachtárskymi regiónmi. Kedy sa plaviť, odkiaľ vyplávať a ktoré zátoky si
+      nenechať ujsť.
+    </p>
+
+    @if (destinations().length) {
+      <ul role="list" class="jump">
+        @for (d of destinations(); track d.slug) {
+          <li>
+            <a [routerLink]="[]" [fragment]="d.slug">{{ d.name }}</a>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</section>
+
+@if (resource.error()) {
+  <section class="section">
+    <div class="container">
+      <div class="empty-state">
+        <span class="empty-state__icon"><app-icon name="alert" [size]="28" /></span>
+        <h2 class="h3">Destinácie sa nepodarilo načítať</h2>
+        <p>Skúste to prosím o chvíľu znova.</p>
+        <button type="button" class="btn btn--outline" (click)="resource.reload()">Skúsiť znova</button>
+      </div>
+    </div>
+  </section>
+} @else if (resource.isLoading()) {
+  <section class="section">
+    <div class="container guide">
+      @for (i of [1, 2]; track i) {
+        <div class="region">
+          <div class="skeleton region__media"></div>
+          <div class="region__body">
+            <div class="skeleton" style="height: 14px; width: 30%"></div>
+            <div class="skeleton" style="height: 44px; width: 70%"></div>
+            <div class="skeleton" style="height: 90px"></div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+} @else {
+  <section class="section">
+    <div class="container guide">
+      @for (d of destinations(); track d.slug; let odd = $odd) {
+        <article class="region" [class.region--reverse]="odd" [id]="d.slug">
+          <a class="region__media" routerLink="/flotila" [queryParams]="{ destination: d.slug }" tabindex="-1" aria-hidden="true">
+            <img [src]="d.coverImageUrl" [alt]="d.name" loading="lazy" />
+          </a>
+
+          <div class="region__body">
+            <span class="eyebrow">{{ d.country }}</span>
+            <h2>{{ d.name }}</h2>
+            <p class="region__desc">{{ d.description }}</p>
+
+            <dl class="facts">
+              <div>
+                <dt><app-icon name="sun" [size]="16" /> Najlepšia sezóna</dt>
+                <dd>{{ d.bestSeason }}</dd>
+              </div>
+              <div>
+                <dt><app-icon name="anchor" [size]="16" /> Východisková marína</dt>
+                <dd>{{ d.departureMarina }}</dd>
+              </div>
+              <div>
+                <dt><app-icon name="sailboat" [size]="16" /> Flotila</dt>
+                <dd>
+                  <span class="tabular">{{ d.yachtCount }}</span> {{ d.yachtCount | plural: plurals.yacht }}
+                  @if (d.priceFrom) {
+                    · od <span class="tabular">{{ d.priceFrom | eur }}</span>
+                  }
+                </dd>
+              </div>
+            </dl>
+
+            <div class="season" [attr.aria-label]="'Plavebná sezóna: ' + d.bestSeason">
+              @for (m of months; track m; let i = $index) {
+                <span class="season__month" [class.is-on]="d.season[i]" aria-hidden="true">{{ m }}</span>
+              }
+            </div>
+
+            @if (d.highlights.length) {
+              <div class="highlights">
+                <span class="highlights__label">Nenechajte si ujsť</span>
+                <ul role="list">
+                  @for (h of d.highlights; track h) {
+                    <li>{{ h }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <div class="region__actions">
+              <a class="btn btn--brass" routerLink="/flotila" [queryParams]="{ destination: d.slug }">
+                Zobraziť {{ d.yachtCount }} {{ d.yachtCount | plural: plurals.yacht }}
+                <app-icon name="arrow-right" [size]="16" />
+              </a>
+              <a class="btn btn--ghost" routerLink="/plavba-na-mieru">Naplánovať trasu</a>
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+}
+
+<section class="section section--navy">
+  <div class="container cta">
+    <div>
+      <span class="eyebrow eyebrow--light">Neviete sa rozhodnúť?</span>
+      <h2>Poradíme vám destináciu podľa termínu a posádky</h2>
+    </div>
+    <p>
+      Plavba s malými deťmi v júni, partia skúsených jachtárov v októbri alebo zimný útek do Karibiku – každý termín má
+      svoju ideálnu destináciu.
+    </p>
+    <div class="cta__actions">
+      <a class="btn btn--brass btn--lg" routerLink="/plavba-na-mieru">Plavba na mieru</a>
+      <a class="btn btn--outline-light btn--lg" [href]="config.contact.phoneHref">{{ config.contact.phone }}</a>
+    </div>
+  </div>
+</section>
