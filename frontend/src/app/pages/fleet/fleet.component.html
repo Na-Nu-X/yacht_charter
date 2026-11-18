@@ -1,0 +1,252 @@
+@let f = filters();
+
+<section class="page-header">
+  <div class="page-header__bg" aria-hidden="true">
+    <img [src]="config.imagery.fleetHeader" alt="" />
+  </div>
+  <div class="container page-header__inner">
+    <nav class="breadcrumbs" aria-label="Omrvinková navigácia">
+      <a routerLink="/">Domov</a><span aria-hidden="true">/</span><span>Flotila jácht</span>
+    </nav>
+    <h1>Katalóg jácht</h1>
+    <p class="lead">
+      Overené plachetnice, katamarány a motorové jachty pripravené na vašu plavbu. Filtrujte podľa destinácie, typu
+      prenájmu a rozpočtu.
+    </p>
+  </div>
+</section>
+
+<section class="section section--tight">
+  <div class="container fleet">
+    <!-- ============ FILTER SIDEBAR ============ -->
+    <div class="filters-backdrop" [class.is-open]="filtersOpen()" (click)="filtersOpen.set(false)"></div>
+    <aside class="filters" [class.is-open]="filtersOpen()" aria-label="Filtre flotily" id="fleet-filters">
+      <div class="filters__head">
+        <h2 class="filters__title">
+          <app-icon name="sliders" [size]="18" /> Filtre
+          @if (activeCount()) {
+            <span class="filters__count tabular">{{ activeCount() }}</span>
+          }
+        </h2>
+        <button type="button" class="filters__close" (click)="filtersOpen.set(false)" aria-label="Zavrieť filtre">
+          <app-icon name="close" [size]="22" />
+        </button>
+      </div>
+
+      <div class="filters__body">
+        <div class="filter">
+          <label class="filter__label" for="fleet-search">Hľadať</label>
+          <div class="filter__search">
+            <app-icon name="search" [size]="18" />
+            <input
+              id="fleet-search"
+              class="input"
+              type="search"
+              placeholder="Model, marína, lodenica…"
+              [value]="searchTerm()"
+              (input)="onSearchInput($any($event.target).value)"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
+        <fieldset class="filter">
+          <legend class="filter__label">Destinácia</legend>
+          <div class="filter__options">
+            <label class="radio">
+              <input
+                type="radio"
+                name="destination"
+                [checked]="!f.destination"
+                (change)="setParam('destination', null)"
+              />
+              <span>Všetky destinácie</span>
+            </label>
+            @for (d of destinations.value() ?? []; track d.slug) {
+              <label class="radio">
+                <input
+                  type="radio"
+                  name="destination"
+                  [checked]="f.destination === d.slug"
+                  (change)="setParam('destination', d.slug)"
+                />
+                <span>{{ d.name }}</span>
+                <small class="tabular">{{ d.yachtCount }}</small>
+              </label>
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="filter">
+          <legend class="filter__label">Typ lode</legend>
+          <div class="filter__options">
+            @for (t of yachtTypes; track t.value) {
+              <label class="check">
+                <input type="checkbox" [checked]="isSelected('yacht_type', t.value)" (change)="toggleMulti('yacht_type', t.value)" />
+                <span>{{ t.label }}</span>
+              </label>
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="filter">
+          <legend class="filter__label">Typ prenájmu</legend>
+          <div class="filter__options">
+            @for (t of charterTypes; track t.value) {
+              <label class="check">
+                <input type="checkbox" [checked]="isSelected('charter_type', t.value)" (change)="toggleMulti('charter_type', t.value)" />
+                <span>{{ t.label }}</span>
+              </label>
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="filter">
+          <legend class="filter__label">Cena za týždeň</legend>
+          <div class="filter__pair">
+            <select class="select" aria-label="Cena od" (change)="setParam('min_price', $any($event.target).value)">
+              <option value="" [selected]="f.minPrice === undefined">Od</option>
+              @for (p of priceSteps; track p) {
+                <option [value]="p" [selected]="f.minPrice === p" [disabled]="f.maxPrice !== undefined && p > f.maxPrice">{{ formatEur(p) }}</option>
+              }
+            </select>
+            <select class="select" aria-label="Cena do" (change)="setParam('max_price', $any($event.target).value)">
+              <option value="" [selected]="f.maxPrice === undefined">Do</option>
+              @for (p of priceSteps; track p) {
+                <option [value]="p" [selected]="f.maxPrice === p" [disabled]="f.minPrice !== undefined && p < f.minPrice">{{ formatEur(p) }}</option>
+              }
+            </select>
+          </div>
+        </fieldset>
+
+        <div class="filter">
+          <label class="filter__label" for="fleet-guests">Počet hostí</label>
+          <select id="fleet-guests" class="select" (change)="setParam('guests', $any($event.target).value)">
+            <option value="">Ľubovoľný</option>
+            @for (g of guestSteps; track g) {
+              <option [value]="g" [selected]="f.minBerths === g">{{ g }} a viac</option>
+            }
+          </select>
+        </div>
+
+        <fieldset class="filter">
+          <legend class="filter__label">Počet kajút</legend>
+          <div class="filter__chips">
+            @for (c of cabinSteps; track c) {
+              <button
+                type="button"
+                class="chip"
+                [attr.aria-pressed]="f.minCabins === c"
+                (click)="setParam('min_cabins', f.minCabins === c ? null : c)"
+              >
+                {{ c }}+
+              </button>
+            }
+          </div>
+        </fieldset>
+
+        <div class="filter">
+          <label class="filter__label" for="fleet-length">Minimálna dĺžka</label>
+          <select id="fleet-length" class="select" (change)="setParam('min_length', $any($event.target).value)">
+            <option value="">Akákoľvek</option>
+            @for (l of lengthSteps; track l) {
+              <option [value]="l" [selected]="f.minLength === l">od {{ l }} m</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="filters__foot">
+        <button type="button" class="btn btn--ghost" (click)="clearAll()" [disabled]="!activeCount()">Zrušiť filtre</button>
+        <button type="button" class="btn btn--brass filters__apply" (click)="filtersOpen.set(false)">
+          Zobraziť {{ results().length }} {{ results().length | plural: plurals.yacht }}
+        </button>
+      </div>
+    </aside>
+
+    <!-- ============ RESULTS ============ -->
+    <div class="results">
+      <div class="toolbar">
+        <p class="toolbar__count" aria-live="polite">
+          @if (yachts.isLoading()) {
+            Hľadáme jachty…
+          } @else {
+            <strong class="tabular">{{ results().length }}</strong> {{ results().length | plural: plurals.yacht }}
+          }
+        </p>
+
+        <div class="toolbar__actions">
+          <button
+            type="button"
+            class="btn btn--outline btn--sm toolbar__filters"
+            (click)="filtersOpen.set(true)"
+            aria-controls="fleet-filters"
+            [attr.aria-expanded]="filtersOpen()"
+          >
+            <app-icon name="sliders" [size]="16" /> Filtre
+            @if (activeCount()) {
+              ({{ activeCount() }})
+            }
+          </button>
+          <label class="toolbar__sort">
+            <span>Zoradiť:</span>
+            <select class="select" (change)="setParam('ordering', $any($event.target).value)">
+              @for (o of orderingOptions; track o.value) {
+                <option [value]="o.value" [selected]="(f.ordering ?? '') === o.value">{{ o.label }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      </div>
+
+      @if (activeChips().length) {
+        <ul role="list" class="active-chips" aria-label="Aktívne filtre">
+          @for (chip of activeChips(); track chip.key + (chip.value ?? '')) {
+            <li>
+              <button type="button" class="active-chip" (click)="removeChip(chip)" [attr.aria-label]="'Odstrániť filter ' + chip.label">
+                {{ chip.label }} <app-icon name="close" [size]="14" />
+              </button>
+            </li>
+          }
+          <li>
+            <button type="button" class="active-chips__clear" (click)="clearAll()">Zrušiť všetko</button>
+          </li>
+        </ul>
+      }
+
+      @if (yachts.error()) {
+        <div class="empty-state">
+          <span class="empty-state__icon"><app-icon name="alert" [size]="28" /></span>
+          <h3>Flotilu sa nepodarilo načítať</h3>
+          <p>Server momentálne neodpovedá. Skúste to prosím o chvíľu znova.</p>
+          <button type="button" class="btn btn--outline" (click)="yachts.reload()">Skúsiť znova</button>
+        </div>
+      } @else if (yachts.isLoading() && !yachts.hasValue()) {
+        <div class="results__grid">
+          @for (i of skeletons; track i) {
+            <app-yacht-card-skeleton />
+          }
+        </div>
+      } @else if (results().length === 0) {
+        <div class="empty-state">
+          <span class="empty-state__icon"><app-icon name="compass" [size]="28" /></span>
+          <h3>Pre tieto filtre nemáme voľnú loď</h3>
+          <p>
+            Skúste upraviť cenu, počet kajút alebo destináciu. Alebo nám povedzte, čo hľadáte – náš broker má prístup k
+            stovkám ďalších lodí.
+          </p>
+          <div class="empty-state__actions">
+            <button type="button" class="btn btn--outline" (click)="clearAll()">Zrušiť filtre</button>
+            <a routerLink="/plavba-na-mieru" class="btn btn--brass">Plavba na mieru</a>
+          </div>
+        </div>
+      } @else {
+        <div class="results__grid" [class.is-refreshing]="yachts.isLoading()">
+          @for (yacht of results(); track yacht.id; let i = $index) {
+            <app-yacht-card [yacht]="yacht" [priority]="i < 2" />
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>

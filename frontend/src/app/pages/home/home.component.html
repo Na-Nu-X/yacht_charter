@@ -17,7 +17,7 @@
     <form class="search fade-in" (submit)="search($event)" aria-label="Rýchle vyhľadávanie jachty">
       <label class="search__field">
         <span class="search__label"><app-icon name="pin" [size]="14" /> Destinácia</span>
-        <select class="search__select" [value]="searchDestination()" (change)="searchDestination.set($any($event.target).value)">
+        <select class="search__select" (change)="searchDestination.set($any($event.target).value)">
           <option value="">Všetky destinácie</option>
           @for (d of destinations.value() ?? []; track d.slug) {
             <option [value]="d.slug">{{ d.name }}</option>
@@ -27,7 +27,7 @@
 
       <label class="search__field">
         <span class="search__label"><app-icon name="sailboat" [size]="14" /> Typ lode</span>
-        <select class="search__select" [value]="searchYachtType()" (change)="searchYachtType.set($any($event.target).value)">
+        <select class="search__select" (change)="searchYachtType.set($any($event.target).value)">
           <option value="">Akýkoľvek typ</option>
           @for (t of yachtTypes; track t.value) {
             <option [value]="t.value">{{ t.label }}</option>
@@ -37,7 +37,7 @@
 
       <label class="search__field">
         <span class="search__label"><app-icon name="wheel" [size]="14" /> Typ prenájmu</span>
-        <select class="search__select" [value]="searchCharterType()" (change)="searchCharterType.set($any($event.target).value)">
+        <select class="search__select" (change)="searchCharterType.set($any($event.target).value)">
           <option value="">S posádkou aj bez</option>
           @for (t of charterTypes; track t.value) {
             <option [value]="t.value">{{ t.label }}</option>
@@ -47,7 +47,7 @@
 
       <label class="search__field">
         <span class="search__label"><app-icon name="users" [size]="14" /> Počet hostí</span>
-        <select class="search__select" [value]="searchGuests()" (change)="searchGuests.set($any($event.target).value)">
+        <select class="search__select" (change)="searchGuests.set($any($event.target).value)">
           <option value="">Ľubovoľný</option>
           @for (n of guestOptions; track n) {
             <option [value]="n">{{ n }}{{ n === 12 ? '+' : '' }} {{ n | plural: plurals.person }}</option>
