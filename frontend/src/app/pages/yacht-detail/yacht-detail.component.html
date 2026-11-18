@@ -1,0 +1,378 @@
+@if (yacht(); as y) {
+  <!-- ============ HEADER BAND ============ -->
+  <section class="dossier-head">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Omrvinková navigácia">
+        <a routerLink="/">Domov</a><span aria-hidden="true">/</span>
+        <a routerLink="/flotila">Flotila jácht</a><span aria-hidden="true">/</span>
+        <a routerLink="/flotila" [queryParams]="{ destination: y.destination.slug }">{{ y.destination.name }}</a>
+      </nav>
+
+      <div class="dossier-head__row">
+        <div class="dossier-head__title">
+          <div class="dossier-head__tags">
+            <span class="badge badge--{{ y.badge }}">{{ y.badgeDisplay }}</span>
+            <span class="dossier-head__type">{{ y.yachtTypeDisplay }} · {{ y.charterTypeDisplay }}</span>
+          </div>
+          <h1>{{ y.name }}</h1>
+          <p class="dossier-head__location">
+            <app-icon name="pin" [size]="16" /> {{ y.homeMarina }} · {{ y.destination.name }}
+          </p>
+        </div>
+
+        <div class="dossier-head__price">
+          <span>od</span>
+          <strong class="tabular">{{ y.weeklyPriceFrom | eur }}</strong>
+          <span>/ týždeň</span>
+        </div>
+      </div>
+
+      <ul role="list" class="dossier-head__stats">
+        <li><strong class="tabular">{{ y.lengthMeters | decimal }} m</strong><span>dĺžka</span></li>
+        <li><strong class="tabular">{{ y.cabins }}</strong><span>{{ y.cabins | plural: plurals.cabin }}</span></li>
+        <li><strong class="tabular">{{ y.berths }}</strong><span>{{ y.berths | plural: plurals.berth }}</span></li>
+        <li><strong class="tabular">{{ y.buildYear }}</strong><span>rok výroby</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ GALLERY ============ -->
+  <section class="gallery container" aria-label="Fotogaléria">
+    <div class="gallery__main">
+      <button type="button" class="gallery__stage" (click)="openLightbox()" aria-label="Otvoriť fotografiu na celú obrazovku">
+        @for (img of gallery(); track img.id; let i = $index) {
+          <img
+            [src]="img.imageUrl"
+            [alt]="img.caption || y.name"
+            [class.is-active]="i === activeImage()"
+            [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+            [attr.fetchpriority]="i === 0 ? 'high' : null"
+          />
+        }
+        <span class="gallery__expand"><app-icon name="expand" [size]="16" /> Celá obrazovka</span>
+        @if (gallery()[activeImage()]?.caption; as caption) {
+          <span class="gallery__caption">{{ caption }}</span>
+        }
+      </button>
+
+      @if (gallery().length > 1) {
+        <button type="button" class="gallery__nav gallery__nav--prev" (click)="selectImage(activeImage() - 1)" aria-label="Predchádzajúca fotografia">
+          <app-icon name="chevron-left" [size]="22" />
+        </button>
+        <button type="button" class="gallery__nav gallery__nav--next" (click)="selectImage(activeImage() + 1)" aria-label="Ďalšia fotografia">
+          <app-icon name="chevron-right" [size]="22" />
+        </button>
+        <span class="gallery__counter tabular">{{ activeImage() + 1 }} / {{ gallery().length }}</span>
+      }
+    </div>
+
+    @if (gallery().length > 1) {
+      <ul role="list" class="gallery__thumbs">
+        @for (img of gallery(); track img.id; let i = $index) {
+          <li>
+            <button
+              type="button"
+              class="gallery__thumb"
+              [class.is-active]="i === activeImage()"
+              [attr.aria-current]="i === activeImage()"
+              [attr.aria-label]="'Fotografia ' + (i + 1) + (img.caption ? ': ' + img.caption : '')"
+              (click)="selectImage(i)"
+            >
+              <img [src]="img.imageUrl" alt="" loading="lazy" />
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <!-- ============ BODY ============ -->
+  <section class="section section--tight">
+    <div class="container dossier">
+      <div class="dossier__content">
+        <article class="block">
+          <span class="eyebrow">O jachte</span>
+          <h2 class="h3">{{ y.manufacturer }} {{ y.modelName }}</h2>
+          <p class="block__text">{{ y.description }}</p>
+        </article>
+
+        <article class="block">
+          <span class="eyebrow">Technické parametre</span>
+          <h2 class="h3">Špecifikácia lode</h2>
+          <dl class="specs">
+            @for (s of specs(); track s.label) {
+              <div class="specs__item">
+                <dt><app-icon [name]="s.icon" [size]="18" /> {{ s.label }}</dt>
+                <dd class="spec-value">{{ s.value }}</dd>
+              </div>
+            }
+          </dl>
+        </article>
+
+        @if (y.equipment.length) {
+          <article class="block">
+            <span class="eyebrow">Na palube</span>
+            <h2 class="h3">Vybavenie lode</h2>
+            <ul class="check-list equipment">
+              @for (item of y.equipment; track item) {
+                <li><app-icon name="check" [size]="16" /> {{ item }}</li>
+              }
+            </ul>
+          </article>
+        }
+
+        <app-charter-cost-calculator
+          [weeklyPrice]="y.weeklyPriceFrom"
+          [transitLog]="y.transitLogFee"
+          [securityDeposit]="y.securityDeposit"
+          [charterType]="y.charterType"
+          [capacity]="y.berths"
+          [(guests)]="guests"
+          [(skipper)]="skipper"
+          [(hostess)]="hostess"
+        />
+
+        <article class="block block--warm">
+          <div class="fees">
+            <div>
+              <span class="fees__label">Vratná kaucia</span>
+              <strong class="tabular">{{ y.securityDeposit > 0 ? (y.securityDeposit | eur) : 'bez kaucie' }}</strong>
+              <small>
+                @if (y.securityDeposit > 0) {
+                  Skladá sa kartou pri check-ine, odporúčame poistenie kaucie.
+                } @else {
+                  Pri lodiach s posádkou sa kaucia neskladá.
+                }
+              </small>
+            </div>
+            <div>
+              <span class="fees__label">Transit log</span>
+              <strong class="tabular">{{ y.transitLogFee > 0 ? (y.transitLogFee | eur) : 'v cene' }}</strong>
+              <small>Upratovanie, posteľná bielizeň, uteráky a plyn.</small>
+            </div>
+            <div>
+              <span class="fees__label">Destinácia</span>
+              <strong>{{ y.destination.bestSeason }}</strong>
+              <small>Najlepšia sezóna · {{ y.destination.departureMarina }}</small>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- ============ STICKY BROKER SIDEBAR ============ -->
+      <aside class="broker" id="dopyt" aria-labelledby="broker-title">
+        <div class="broker__card">
+          <div class="broker__head">
+            <span class="eyebrow eyebrow--plain">Charterový broker</span>
+            <h2 id="broker-title" class="h4">Overiť dostupnosť termínu</h2>
+            <p>Odpovieme do 24 hodín s presnou cenou pre váš termín.</p>
+          </div>
+
+          @if (y.badge === 'obsadena') {
+            <div class="broker__booked">
+              <app-icon name="info" [size]="20" />
+              <p>
+                Táto jachta je v aktuálnej sezóne <strong>obsadená</strong>. Radi vám nájdeme podobnú alternatívu alebo
+                termín na budúci rok.
+              </p>
+              <a class="btn btn--brass btn--block" routerLink="/plavba-na-mieru">Nájsť alternatívu</a>
+            </div>
+          } @else if (submitted()) {
+            <div class="broker__success" role="status">
+              <span class="broker__success-icon"><app-icon name="check-circle" [size]="34" /></span>
+              <h3>Ďakujeme, dopyt sme prijali</h3>
+              <p>
+                Náš broker overí dostupnosť lode <strong>{{ y.name }}</strong> a ozve sa vám do 24 hodín na e-mail
+                <strong>{{ form.controls.email.value }}</strong>.
+              </p>
+              <button type="button" class="btn btn--outline btn--block" (click)="resetInquiry()">Poslať ďalší dopyt</button>
+            </div>
+          } @else {
+            <form class="broker__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+              <div class="broker__row">
+                <div class="field">
+                  <label class="field__label" for="inq-date">Nalodenie (sobota)</label>
+                  <input id="inq-date" class="input" type="date" step="7" [min]="minDate" formControlName="check_in_date" />
+                  @if (fieldError('check_in_date'); as err) {
+                    <span class="field__error">{{ err }}</span>
+                  }
+                </div>
+                <div class="field">
+                  <label class="field__label" for="inq-weeks">Dĺžka</label>
+                  <select id="inq-weeks" class="select" formControlName="duration_weeks">
+                    @for (w of weekOptions; track w) {
+                      <option [ngValue]="w">{{ w }} {{ w | plural: plurals.week }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="inq-guests">Počet hostí</label>
+                <select id="inq-guests" class="select" formControlName="guests_count">
+                  @for (n of guestOptions(y.berths); track n) {
+                    <option [ngValue]="n">{{ n }} {{ n | plural: plurals.person }}</option>
+                  }
+                </select>
+                @if (fieldError('guests_count'); as err) {
+                  <span class="field__error">{{ err }}</span>
+                }
+              </div>
+
+              @if (y.charterType !== 's_posadkou') {
+                <div class="broker__extras">
+                  <label class="check">
+                    <input type="checkbox" formControlName="skipper_needed" />
+                    <span>Kapitán <small>(cca {{ config.pricing.skipperWeekly | eur }}/týž.)</small></span>
+                  </label>
+                  <label class="check">
+                    <input type="checkbox" formControlName="hostess_needed" />
+                    <span>Hosteska <small>(cca {{ config.pricing.hostessWeekly | eur }}/týž.)</small></span>
+                  </label>
+                </div>
+              }
+
+              <div class="field">
+                <label class="field__label" for="inq-name">Meno a priezvisko</label>
+                <input id="inq-name" class="input" type="text" autocomplete="name" formControlName="client_name" />
+                @if (fieldError('client_name'); as err) {
+                  <span class="field__error">{{ err }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="inq-email">E-mail</label>
+                <input id="inq-email" class="input" type="email" autocomplete="email" formControlName="email" />
+                @if (fieldError('email'); as err) {
+                  <span class="field__error">{{ err }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="inq-phone">Telefón</label>
+                <input id="inq-phone" class="input" type="tel" autocomplete="tel" placeholder="+421 900 123 456" formControlName="phone" />
+                @if (fieldError('phone'); as err) {
+                  <span class="field__error">{{ err }}</span>
+                }
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="inq-msg">Správa <small>(nepovinné)</small></label>
+                <textarea id="inq-msg" class="textarea" rows="3" placeholder="Skúsenosti posádky, požadovaná trasa, otázky…" formControlName="message"></textarea>
+              </div>
+
+              <label class="check">
+                <input type="checkbox" formControlName="consent" />
+                <span>Súhlasím so spracovaním osobných údajov za účelom vybavenia dopytu.</span>
+              </label>
+              @if (fieldError('consent'); as err) {
+                <span class="field__error">{{ err }}</span>
+              }
+
+              @if (serverError(); as err) {
+                <div class="form-alert form-alert--error" role="alert">
+                  <app-icon name="alert" [size]="18" /> {{ err }}
+                </div>
+              }
+
+              <button type="submit" class="btn btn--brass btn--block btn--lg" [disabled]="submitting()">
+                @if (submitting()) {
+                  <span class="spinner"></span> Odosielam…
+                } @else {
+                  Overiť dostupnosť termínu
+                }
+              </button>
+              <p class="broker__note">Nezáväzný dopyt · bez poplatkov</p>
+            </form>
+          }
+        </div>
+
+        <div class="broker__contact">
+          <app-icon name="phone" [size]="18" />
+          <div>
+            <span>Radšej telefonicky?</span>
+            <a [href]="config.contact.phoneHref" class="tabular">{{ config.contact.phone }}</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ SIMILAR ============ -->
+  @if (similar().length) {
+    <section class="section section--warm">
+      <div class="container">
+        <header class="section-head section-head--split">
+          <div>
+            <span class="eyebrow">{{ y.destination.name }}</span>
+            <h2>Ďalšie jachty v tejto destinácii</h2>
+          </div>
+          <a routerLink="/flotila" [queryParams]="{ destination: y.destination.slug }" class="link-arrow">
+            Všetky jachty <app-icon name="arrow-right" [size]="16" />
+          </a>
+        </header>
+        <div class="grid-cards">
+          @for (s of similar(); track s.id) {
+            <app-yacht-card [yacht]="s" />
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ============ LIGHTBOX ============ -->
+  @if (lightboxOpen()) {
+    <div class="lightbox" role="dialog" aria-modal="true" [attr.aria-label]="'Fotogaléria – ' + y.name" (click)="closeLightbox()">
+      <button #lightboxClose type="button" class="lightbox__close" (click)="closeLightbox()" aria-label="Zavrieť galériu">
+        <app-icon name="close" [size]="26" />
+      </button>
+
+      <figure class="lightbox__figure" (click)="$event.stopPropagation()">
+        <img [src]="gallery()[activeImage()].imageUrl" [alt]="gallery()[activeImage()].caption || y.name" />
+        <figcaption>
+          <span>{{ gallery()[activeImage()].caption }}</span>
+          <span class="tabular">{{ activeImage() + 1 }} / {{ gallery().length }}</span>
+        </figcaption>
+      </figure>
+
+      @if (gallery().length > 1) {
+        <button type="button" class="lightbox__nav lightbox__nav--prev" (click)="$event.stopPropagation(); selectImage(activeImage() - 1)" aria-label="Predchádzajúca fotografia">
+          <app-icon name="chevron-left" [size]="30" />
+        </button>
+        <button type="button" class="lightbox__nav lightbox__nav--next" (click)="$event.stopPropagation(); selectImage(activeImage() + 1)" aria-label="Ďalšia fotografia">
+          <app-icon name="chevron-right" [size]="30" />
+        </button>
+      }
+    </div>
+  }
+} @else if (notFound()) {
+  <section class="page-header">
+    <div class="container page-header__inner">
+      <span class="eyebrow eyebrow--light">Jachta nenájdená</span>
+      <h1>Táto loď už nie je v ponuke</h1>
+      <p class="lead">Jachtu sme vo flotile nenašli. Pozrite si ďalšie lode alebo nás kontaktujte.</p>
+      <div><a class="btn btn--brass" routerLink="/flotila">Späť na flotilu</a></div>
+    </div>
+  </section>
+} @else if (yachtResource.error()) {
+  <section class="page-header">
+    <div class="container page-header__inner">
+      <span class="eyebrow eyebrow--light">Chyba spojenia</span>
+      <h1>Detail jachty sa nepodarilo načítať</h1>
+      <p class="lead">Skontrolujte pripojenie a skúste to znova.</p>
+      <div><button type="button" class="btn btn--brass" (click)="yachtResource.reload()">Skúsiť znova</button></div>
+    </div>
+  </section>
+} @else {
+  <!-- Loading skeleton -->
+  <section class="dossier-head" aria-busy="true">
+    <div class="container">
+      <div class="skeleton skeleton--dark" style="height: 14px; width: 220px"></div>
+      <div class="skeleton skeleton--dark" style="height: 52px; width: min(520px, 90%); margin-top: 24px"></div>
+      <div class="skeleton skeleton--dark" style="height: 16px; width: 280px; margin-top: 16px"></div>
+    </div>
+  </section>
+  <section class="gallery container">
+    <div class="skeleton gallery__skeleton"></div>
+  </section>
+}
