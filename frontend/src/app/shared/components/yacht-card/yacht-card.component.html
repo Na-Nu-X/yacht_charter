@@ -1,0 +1,54 @@
+@let y = yacht();
+<article class="card" [class.card--booked]="y.badge === 'obsadena'">
+  <a class="card__media" [routerLink]="['/flotila', y.slug]" tabindex="-1" aria-hidden="true">
+    <img
+      [src]="y.coverImageUrl"
+      [alt]="y.name"
+      [attr.loading]="priority() ? 'eager' : 'lazy'"
+      decoding="async"
+      width="800"
+      height="560"
+    />
+    <span class="badge badge--{{ y.badge }} card__badge">{{ y.badgeDisplay }}</span>
+    <span class="card__type">{{ y.yachtTypeDisplay }}</span>
+  </a>
+
+  <div class="card__body">
+    <p class="card__location">
+      <app-icon name="pin" [size]="14" />
+      {{ y.homeMarina }} · {{ y.destination.country }}
+    </p>
+
+    <h3 class="card__title">
+      <a [routerLink]="['/flotila', y.slug]">{{ y.name }}</a>
+    </h3>
+
+    <ul role="list" class="card__specs">
+      <li title="Dĺžka">
+        <app-icon name="ruler" [size]="16" />
+        <span class="spec-value">{{ y.lengthMeters | decimal }} m</span>
+      </li>
+      <li title="Kajuty">
+        <app-icon name="door" [size]="16" />
+        <span class="spec-value">{{ y.cabins }}</span>&nbsp;{{ y.cabins | plural: plurals.cabin }}
+      </li>
+      <li title="Lôžka">
+        <app-icon name="bed" [size]="16" />
+        <span class="spec-value">{{ y.berths }}</span>&nbsp;{{ y.berths | plural: plurals.berth }}
+      </li>
+      <li title="Rok výroby">
+        <app-icon name="calendar" [size]="16" />
+        <span class="spec-value">{{ y.buildYear }}</span>
+      </li>
+    </ul>
+
+    <div class="card__footer">
+      <p class="card__price">
+        <span class="card__price-label">od</span>
+        <span class="price">{{ y.weeklyPriceFrom | eur }}</span>
+        <span class="card__price-label">/ týždeň</span>
+      </p>
+      <span class="card__charter">{{ y.charterTypeDisplay }}</span>
+    </div>
+  </div>
+</article>

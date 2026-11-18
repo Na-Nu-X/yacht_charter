@@ -1,0 +1,178 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+:host {
+  display: block;
+}
+
+.card {
+  @include card;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  transition:
+    box-shadow $duration-slow $ease-out,
+    transform $duration-slow $ease-out,
+    border-color $duration $ease-out;
+
+  &:hover,
+  &:focus-within {
+    box-shadow: var(--shadow-lg);
+    border-color: transparent;
+    transform: translateY(-3px);
+
+    img {
+      transform: scale(1.06);
+    }
+
+    .card__title a {
+      color: var(--color-accent-hover);
+    }
+  }
+
+  &--booked img {
+    filter: saturate(0.6);
+  }
+
+  &__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 10 / 7;
+    overflow: hidden;
+    background: var(--color-surface-warm);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform $duration-slow $ease-out;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0;
+      height: 40%;
+      background: linear-gradient(to top, rgba(11, 29, 51, 0.45), transparent);
+      pointer-events: none;
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: $space-4;
+    left: $space-4;
+    z-index: 1;
+  }
+
+  &__type {
+    position: absolute;
+    left: $space-4;
+    bottom: $space-3;
+    z-index: 1;
+    font-size: $fs-xs;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: $space-3;
+    padding: $space-5;
+  }
+
+  &__location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: $fs-xs;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--color-text-subtle);
+
+    app-icon {
+      color: var(--color-brass);
+    }
+  }
+
+  &__title {
+    font-size: 1.6rem;
+    line-height: 1.15;
+
+    a {
+      transition: color $duration;
+
+      // Make the whole card clickable while keeping a single link in the a11y tree.
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+      }
+    }
+  }
+
+  &__specs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-2 $space-4;
+    padding: $space-4 0;
+    border-block: 1px solid var(--color-border);
+    font-size: $fs-sm;
+    color: var(--color-text-muted);
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: $space-2;
+    }
+
+    app-icon {
+      color: var(--color-text-subtle);
+    }
+  }
+
+  .spec-value {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  &__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $space-2;
+    margin-top: auto;
+  }
+
+  &__price {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+
+    .price {
+      font-family: var(--font-serif);
+      font-size: 1.65rem;
+      font-weight: 600;
+      color: var(--color-accent);
+    }
+  }
+
+  &__price-label {
+    font-size: $fs-xs;
+    color: var(--color-text-subtle);
+  }
+
+  &__charter {
+    font-size: $fs-xs;
+    font-weight: 600;
+    color: var(--color-brass-hover);
+  }
+}

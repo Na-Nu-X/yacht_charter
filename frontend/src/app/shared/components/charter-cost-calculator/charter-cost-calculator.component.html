@@ -1,0 +1,133 @@
+<section class="calc" aria-labelledby="calc-title">
+  <header class="calc__head">
+    <span class="eyebrow eyebrow--plain">Kalkulačka</span>
+    <h3 id="calc-title">Odhad nákladov na týždeň</h3>
+    <p>Upravte počet osôb a voliteľné služby – cenu na osobu prepočítame okamžite.</p>
+  </header>
+
+  <div class="calc__grid">
+    <div class="calc__controls">
+      <div class="calc__guests">
+        <div class="calc__row-label">
+          <span id="guests-label">Počet osôb na palube</span>
+          <span class="calc__guests-value tabular" aria-live="polite">{{ guests() }}&nbsp;{{ guests() | plural: plurals.person }}</span>
+        </div>
+        <div class="calc__stepper">
+          <button
+            type="button"
+            class="calc__step"
+            (click)="setGuests(guests() - 1)"
+            [disabled]="guests() <= minGuests"
+            aria-label="Menej osôb"
+          >
+            <app-icon name="minus" [size]="18" />
+          </button>
+          <input
+            type="range"
+            class="calc__range"
+            [min]="minGuests"
+            [max]="maxGuests()"
+            step="1"
+            [value]="guests()"
+            (input)="setGuests($any($event.target).value)"
+            aria-labelledby="guests-label"
+            [style.--fill]="((guests() - minGuests) / (maxGuests() - minGuests || 1)) * 100 + '%'"
+          />
+          <button
+            type="button"
+            class="calc__step"
+            (click)="setGuests(guests() + 1)"
+            [disabled]="guests() >= maxGuests()"
+            aria-label="Viac osôb"
+          >
+            <app-icon name="plus" [size]="18" />
+          </button>
+        </div>
+        <p class="calc__hint">Kapacita lode: {{ capacity() }}&nbsp;{{ capacity() | plural: plurals.person }}</p>
+      </div>
+
+      @if (crewIncluded()) {
+        <div class="calc__crew-note">
+          <app-icon name="check-circle" [size]="20" />
+          <p>
+            <strong>Kompletná posádka je v cene.</strong> Kapitán, hosteska aj námorník sa o vás postarajú počas celej
+            plavby.
+          </p>
+        </div>
+      } @else {
+        <div class="calc__toggles" role="group" aria-label="Voliteľné služby">
+          <button
+            type="button"
+            class="toggle"
+            role="switch"
+            [attr.aria-checked]="skipper()"
+            [class.is-locked]="skipperRequired()"
+            [attr.aria-disabled]="skipperRequired()"
+            (click)="toggleSkipper()"
+          >
+            <span class="toggle__icon"><app-icon name="wheel" [size]="20" /></span>
+            <span class="toggle__text">
+              <strong>Kapitán (skiper)</strong>
+              <small>
+                @if (skipperRequired()) {
+                  Povinný pri tejto lodi ·
+                }
+                cca {{ pricing.skipperWeekly | eur }} / týždeň
+              </small>
+            </span>
+            <span class="toggle__switch" aria-hidden="true"></span>
+          </button>
+
+          <button type="button" class="toggle" role="switch" [attr.aria-checked]="hostess()" (click)="toggleHostess()">
+            <span class="toggle__icon"><app-icon name="glass" [size]="20" /></span>
+            <span class="toggle__text">
+              <strong>Hosteska</strong>
+              <small>cca {{ pricing.hostessWeekly | eur }} / týždeň</small>
+            </span>
+            <span class="toggle__switch" aria-hidden="true"></span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="calc__summary">
+      <ul role="list" class="calc__items">
+        @for (item of lineItems(); track item.label) {
+          <li>
+            <span>
+              {{ item.label }}
+              @if (item.note) {
+                <small>{{ item.note }}</small>
+              }
+            </span>
+            <span class="tabular">{{ item.amount === 0 ? 'v cene' : (item.amount | eur) }}</span>
+          </li>
+        }
+      </ul>
+
+      <div class="calc__total">
+        <span>Celkom za týždeň</span>
+        <strong class="tabular">{{ total() | eur }}</strong>
+      </div>
+
+      <div class="calc__per-person">
+        <span>Na osobu</span>
+        <strong class="tabular" aria-live="polite">{{ perPerson() | eur }}</strong>
+        <small>pri {{ guests() }}&nbsp;{{ guests() | plural: plurals.person }} na palube</small>
+      </div>
+
+      <p class="calc__disclaimer">
+        <app-icon name="info" [size]="14" />
+        <span>
+          Orientačný odhad podľa ceny „od“ v hlavnej sezóne.
+          @if (securityDeposit() > 0) {
+            Vratná kaucia {{ securityDeposit() | eur }} nie je zahrnutá.
+          }
+          @if (!crewIncluded()) {
+            Palivo a prístavné poplatky sa hradia na mieste.
+          }
+        </span>
+      </p>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,95 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <a routerLink="/" class="footer__wordmark">
+          <span>{{ config.brand.wordmark.primary }}</span>
+          <small>{{ config.brand.wordmark.secondary }}</small>
+        </a>
+        <p>{{ config.brand.description }}</p>
+        <ul role="list" class="footer__social">
+          @for (social of config.social; track social.label) {
+            <li>
+              <a [href]="social.url" target="_blank" rel="noopener" [attr.aria-label]="social.label">
+                <app-icon [name]="social.icon" [size]="18" />
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+
+      <nav class="footer__col" aria-label="Rýchla navigácia">
+        <h2 class="footer__heading">Navigácia</h2>
+        <ul role="list">
+          <li><a routerLink="/flotila">Flotila jácht</a></li>
+          <li><a routerLink="/destinacie">Destinácie a maríny</a></li>
+          <li><a routerLink="/plavba-na-mieru">Plavba na mieru</a></li>
+          <li><a routerLink="/o-nas-a-kontakt">Ako to funguje</a></li>
+          <li><a routerLink="/o-nas-a-kontakt" fragment="kontakt">Kontakt</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer__col">
+        <h2 class="footer__heading">Charter desk</h2>
+        <ul role="list" class="footer__contact">
+          <li>
+            <app-icon name="phone" [size]="16" />
+            <a [href]="config.contact.phoneHref" class="tabular">{{ config.contact.phone }}</a>
+          </li>
+          <li>
+            <app-icon name="lifebuoy" [size]="16" />
+            <span>
+              <a [href]="config.contact.hotlineHref" class="tabular">{{ config.contact.hotline }}</a>
+              <small>{{ config.contact.hotlineNote }}</small>
+            </span>
+          </li>
+          <li>
+            <app-icon name="mail" [size]="16" />
+            <a [href]="'mailto:' + config.contact.email">{{ config.contact.email }}</a>
+          </li>
+          <li>
+            <app-icon name="sparkle" [size]="16" />
+            <span>
+              <a [href]="'mailto:' + config.contact.vipEmail">{{ config.contact.vipEmail }}</a>
+              <small>VIP charter desk – superjachty</small>
+            </span>
+          </li>
+          <li>
+            <app-icon name="pin" [size]="16" />
+            <span>
+              {{ config.contact.address.street }}, {{ config.contact.address.zip }} {{ config.contact.address.city }}
+              <small>{{ config.contact.openingHours }}</small>
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__heading">Partnerské maríny</h2>
+        <ul role="list" class="footer__marinas">
+          @for (marina of config.partnerMarinas; track marina) {
+            <li>{{ marina }}</li>
+          }
+        </ul>
+        <p class="footer__note">
+          Lode prevádzkujú overení partneri v certifikovaných marínach. Agentúra vystupuje ako sprostredkovateľ charteru.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div class="footer__legal">
+        <p>
+          © {{ year }} {{ config.company.legalName }} · IČO <span class="tabular">{{ config.company.ico }}</span> · DIČ
+          <span class="tabular">{{ config.company.dic }}</span> · IČ DPH <span class="tabular">{{ config.company.icDph }}</span>
+        </p>
+        <p>{{ config.company.registry }}</p>
+      </div>
+      <p class="footer__gdpr">
+        Osobné údaje odoslané cez formuláre spracúvame výhradne na vybavenie vášho dopytu v súlade s nariadením
+        GDPR (EÚ) 2016/679 a zákonom č. 18/2018 Z. z. Údaje neposkytujeme tretím stranám okrem prevádzkovateľa lode
+        nevyhnutného na rezerváciu.
+      </p>
+    </div>
+  </div>
+</footer>

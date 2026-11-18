@@ -1,0 +1,221 @@
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero__bg" aria-hidden="true">
+    <img [src]="config.imagery.hero" alt="" fetchpriority="high" />
+  </div>
+
+  <div class="hero__content container">
+    <div class="hero__copy fade-in">
+      <span class="eyebrow eyebrow--light">{{ config.brand.tagline }}</span>
+      <h1>Stredomorie z paluby <em class="serif-italic">vašej&nbsp;vlastnej</em> jachty</h1>
+      <p class="hero__lead">
+        Plachetnice, katamarány a luxusné motorové jachty v Chorvátsku, Grécku, Taliansku, Španielsku a Karibiku.
+        S kapitánom, s posádkou alebo len vy a vietor.
+      </p>
+    </div>
+
+    <form class="search fade-in" (submit)="search($event)" aria-label="Rýchle vyhľadávanie jachty">
+      <label class="search__field">
+        <span class="search__label"><app-icon name="pin" [size]="14" /> Destinácia</span>
+        <select class="search__select" [value]="searchDestination()" (change)="searchDestination.set($any($event.target).value)">
+          <option value="">Všetky destinácie</option>
+          @for (d of destinations.value() ?? []; track d.slug) {
+            <option [value]="d.slug">{{ d.name }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="search__field">
+        <span class="search__label"><app-icon name="sailboat" [size]="14" /> Typ lode</span>
+        <select class="search__select" [value]="searchYachtType()" (change)="searchYachtType.set($any($event.target).value)">
+          <option value="">Akýkoľvek typ</option>
+          @for (t of yachtTypes; track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="search__field">
+        <span class="search__label"><app-icon name="wheel" [size]="14" /> Typ prenájmu</span>
+        <select class="search__select" [value]="searchCharterType()" (change)="searchCharterType.set($any($event.target).value)">
+          <option value="">S posádkou aj bez</option>
+          @for (t of charterTypes; track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="search__field">
+        <span class="search__label"><app-icon name="users" [size]="14" /> Počet hostí</span>
+        <select class="search__select" [value]="searchGuests()" (change)="searchGuests.set($any($event.target).value)">
+          <option value="">Ľubovoľný</option>
+          @for (n of guestOptions; track n) {
+            <option [value]="n">{{ n }}{{ n === 12 ? '+' : '' }} {{ n | plural: plurals.person }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="submit" class="btn btn--brass btn--lg search__submit">
+        <app-icon name="search" [size]="18" /> Hľadať jachty
+      </button>
+    </form>
+
+    <ul role="list" class="hero__metrics">
+      @for (m of config.trustMetrics; track m.label) {
+        <li>
+          <strong class="tabular">{{ m.value }}</strong>
+          <span>{{ m.label }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<!-- ============ FEATURED YACHTS ============ -->
+<section class="section">
+  <div class="container">
+    <header class="section-head section-head--split">
+      <div>
+        <span class="eyebrow">Flotila</span>
+        <h2>Vybrané jachty z našej flotily</h2>
+      </div>
+      <a routerLink="/flotila" class="link-arrow">Celá flotila <app-icon name="arrow-right" [size]="16" /></a>
+    </header>
+
+    @if (featured.error()) {
+      <div class="empty-state">
+        <span class="empty-state__icon"><app-icon name="alert" [size]="28" /></span>
+        <h3>Flotilu sa nepodarilo načítať</h3>
+        <p>Skontrolujte pripojenie alebo to skúste o chvíľu znova.</p>
+        <button class="btn btn--outline" type="button" (click)="featured.reload()">Skúsiť znova</button>
+      </div>
+    } @else {
+      <div class="grid-cards">
+        @if (featured.isLoading()) {
+          @for (i of [1, 2, 3]; track i) {
+            <app-yacht-card-skeleton />
+          }
+        } @else {
+          @for (yacht of featuredYachts(); track yacht.id; let i = $index) {
+            <app-yacht-card [yacht]="yacht" [priority]="i < 3" />
+          }
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<!-- ============ DESTINATIONS ============ -->
+<section class="section section--warm">
+  <div class="container">
+    <header class="section-head section-head--split">
+      <div>
+        <span class="eyebrow">Destinácie</span>
+        <h2>Obľúbené destinácie</h2>
+        <p class="lead">Od kamenných prístavov Dalmácie po tyrkysové zátoky Karibiku – sezóna na mori trvá celý rok.</p>
+      </div>
+      <a routerLink="/destinacie" class="link-arrow">Sprievodca destináciami <app-icon name="arrow-right" [size]="16" /></a>
+    </header>
+
+    <div class="destinations">
+      @if (destinations.isLoading()) {
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <div class="skeleton destination"></div>
+        }
+      } @else {
+        @for (d of featuredDestinations(); track d.slug) {
+          <a class="destination" [routerLink]="['/flotila']" [queryParams]="{ destination: d.slug }">
+            <img [src]="d.coverImageUrl" [alt]="d.name" loading="lazy" />
+            <div class="destination__overlay">
+              <span class="destination__season"><app-icon name="sun" [size]="14" /> {{ d.bestSeason }}</span>
+              <h3>{{ d.name }}</h3>
+              <p class="destination__meta">
+                <span class="tabular">{{ d.yachtCount }}</span>&nbsp;{{ d.yachtCount | plural: plurals.yacht }}
+                @if (d.priceFrom) {
+                  · od <span class="tabular">{{ d.priceFrom | eur }}</span>
+                }
+              </p>
+            </div>
+          </a>
+        }
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY US ============ -->
+<section class="section">
+  <div class="container">
+    <header class="section-head section-head--center">
+      <span class="eyebrow">Prečo plávať s nami</span>
+      <h2>Istota na pevnine aj na mori</h2>
+      <p class="lead">
+        Od roku {{ config.brand.foundedYear }} sme pomohli tisíckam posádok nájsť tú správnu loď. Staráme sa o vás od
+        prvého dopytu až po návrat do maríny.
+      </p>
+    </header>
+
+    <ul role="list" class="pillars">
+      @for (p of pillars; track p.title) {
+        <li class="pillar">
+          <span class="pillar__icon"><app-icon [name]="p.icon" [size]="28" [stroke]="1.25" /></span>
+          <h3>{{ p.title }}</h3>
+          <p>{{ p.text }}</p>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<!-- ============ CUSTOM CHARTER BANNER ============ -->
+<section class="banner">
+  <img class="banner__bg" [src]="config.imagery.customBanner" alt="" loading="lazy" />
+  <div class="container banner__inner">
+    <div class="banner__copy">
+      <span class="eyebrow eyebrow--light">Plavba na mieru</span>
+      <h2>Rodinná dovolenka, oslava alebo firemná regata?</h2>
+      <p>
+        Povedzte nám, o čom snívate, a do 24 hodín vám pošleme 2 – 3 ponuky lodí s trasou, posádkou a presnou cenou.
+        Nezáväzne a bezplatne.
+      </p>
+      <ul role="list" class="banner__list">
+        <li><app-icon name="check" [size]="16" /> Osobný charterový broker</li>
+        <li><app-icon name="check" [size]="16" /> Lode, ktoré nenájdete v katalógu</li>
+        <li><app-icon name="check" [size]="16" /> Transfery, provisioning, kapitán</li>
+      </ul>
+      <div class="banner__actions">
+        <a routerLink="/plavba-na-mieru" class="btn btn--brass btn--lg">Navrhnúť plavbu na mieru</a>
+        <a [href]="config.contact.phoneHref" class="btn btn--outline-light btn--lg">
+          <app-icon name="phone" [size]="18" /> {{ config.contact.phone }}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section class="section section--warm">
+  <div class="container">
+    <header class="section-head section-head--center">
+      <span class="eyebrow">Skúsenosti posádok</span>
+      <h2>Čo hovoria naši jachtári</h2>
+    </header>
+
+    <ul role="list" class="testimonials">
+      @for (t of testimonials; track t.author) {
+        <li class="testimonial">
+          <div class="testimonial__stars" [attr.aria-label]="'Hodnotenie ' + t.rating + ' z 5'">
+            @for (s of stars(t.rating); track s) {
+              <app-icon name="star" [size]="16" />
+            }
+          </div>
+          <blockquote>„{{ t.quote }}“</blockquote>
+          <footer>
+            <strong>{{ t.author }}</strong>
+            <span>{{ t.detail }}</span>
+          </footer>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

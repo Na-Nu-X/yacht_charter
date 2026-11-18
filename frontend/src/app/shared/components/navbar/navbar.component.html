@@ -1,0 +1,71 @@
+<header class="navbar" [class.navbar--solid]="solid()">
+  <div class="navbar__inner container">
+    <a class="wordmark" routerLink="/" [attr.aria-label]="config.brand.name + ' – úvodná stránka'">
+      <span class="wordmark__mark" aria-hidden="true">
+        <app-icon name="sailboat" [size]="22" />
+      </span>
+      <span class="wordmark__text">
+        <span class="wordmark__primary">{{ config.brand.wordmark.primary }}</span>
+        <span class="wordmark__secondary">{{ config.brand.wordmark.secondary }}</span>
+      </span>
+    </a>
+
+    <nav class="navbar__nav" aria-label="Hlavná navigácia">
+      <ul role="list">
+        @for (link of links; track link.path) {
+          <li>
+            <a
+              class="navbar__link"
+              [routerLink]="link.path"
+              routerLinkActive="is-active"
+              ariaCurrentWhenActive="page"
+              >{{ link.label }}</a
+            >
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="navbar__actions">
+      <a class="navbar__phone" [href]="config.contact.phoneHref">
+        <app-icon name="phone" [size]="16" />
+        <span class="tabular">{{ config.contact.phone }}</span>
+      </a>
+      <a class="btn btn--brass navbar__cta" routerLink="/plavba-na-mieru">Nezáväzná ponuka</a>
+      <button
+        type="button"
+        class="navbar__toggle"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="mobile-drawer"
+        [attr.aria-label]="menuOpen() ? 'Zavrieť menu' : 'Otvoriť menu'"
+        (click)="toggleMenu()"
+      >
+        <app-icon [name]="menuOpen() ? 'close' : 'menu'" [size]="24" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer" id="mobile-drawer" [class.is-open]="menuOpen()" [attr.aria-hidden]="!menuOpen()" [attr.inert]="menuOpen() ? null : ''">
+  <div class="drawer__backdrop" (click)="closeMenu()"></div>
+  <nav class="drawer__panel" aria-label="Mobilná navigácia">
+    <ul role="list" class="drawer__links">
+      <li><a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }">Domov</a></li>
+      @for (link of links; track link.path) {
+        <li>
+          <a [routerLink]="link.path" routerLinkActive="is-active">{{ link.label }}</a>
+        </li>
+      }
+    </ul>
+
+    <div class="drawer__footer">
+      <a class="btn btn--brass btn--block btn--lg" routerLink="/plavba-na-mieru">Nezáväzná ponuka</a>
+      <a class="drawer__contact" [href]="config.contact.phoneHref">
+        <app-icon name="phone" [size]="18" /> <span class="tabular">{{ config.contact.phone }}</span>
+      </a>
+      <a class="drawer__contact" [href]="'mailto:' + config.contact.email">
+        <app-icon name="mail" [size]="18" /> {{ config.contact.email }}
+      </a>
+    </div>
+  </nav>
+</div>
