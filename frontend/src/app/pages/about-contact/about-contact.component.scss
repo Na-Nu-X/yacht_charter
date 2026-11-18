@@ -1,0 +1,318 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+// --- Tabs & steps -----------------------------------------------------------------
+.tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: $radius-pill;
+  background: var(--color-surface-warm);
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    min-height: 44px;
+    padding: 0 $space-5;
+    border-radius: $radius-pill;
+    font-size: $fs-sm;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    transition: all $duration;
+
+    &[aria-selected='true'] {
+      background: var(--color-accent);
+      color: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+  }
+}
+
+.steps {
+  display: grid;
+  gap: $space-5;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @include up(md) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include up(lg) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  &__item {
+    display: grid;
+    align-content: start;
+    gap: $space-3;
+    padding-top: $space-5;
+    border-top: 1px solid var(--color-accent);
+
+    h3 {
+      font-size: $fs-xl;
+    }
+
+    p {
+      font-size: $fs-sm;
+      line-height: 1.7;
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__num {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--color-brass);
+  }
+}
+
+// --- License ----------------------------------------------------------------------
+.license {
+  display: grid;
+  gap: $space-6;
+
+  @include up(lg) {
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    gap: $space-8;
+  }
+
+  &__copy {
+    display: grid;
+    gap: $space-4;
+  }
+
+  &__note {
+    display: flex;
+    gap: $space-3;
+    font-size: $fs-sm;
+    color: var(--color-text-muted);
+
+    app-icon {
+      flex-shrink: 0;
+      color: var(--color-brass);
+    }
+  }
+
+  &__card {
+    @include card;
+    display: grid;
+    gap: $space-5;
+    padding: $space-6;
+    box-shadow: var(--shadow);
+  }
+}
+
+// --- Money ------------------------------------------------------------------------
+.money {
+  display: grid;
+  gap: $space-5;
+
+  @include up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &__card {
+    @include card;
+    display: grid;
+    align-content: start;
+    gap: $space-3;
+    padding: $space-6;
+
+    p {
+      font-size: $fs-sm;
+      line-height: 1.7;
+      color: var(--color-text-muted);
+    }
+
+    &--accent {
+      background: var(--color-navy-deep);
+      border-color: var(--color-navy-deep);
+      color: #fff;
+
+      p {
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .money__icon {
+        border-color: var(--color-brass-light);
+        color: var(--color-brass-light);
+      }
+    }
+  }
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: $space-2;
+    border: 1px solid var(--color-brass);
+    border-radius: 50%;
+    color: var(--color-brass);
+  }
+}
+
+// --- FAQ --------------------------------------------------------------------------
+.faq {
+  max-width: $container-narrow;
+  margin: clamp($space-7, 6vw, $space-8) auto 0;
+
+  &__title {
+    margin-bottom: $space-4;
+    font-size: $fs-2xl;
+    text-align: center;
+  }
+
+  &__item {
+    border-bottom: 1px solid var(--color-border);
+
+    summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $space-4;
+      padding: $space-5 0;
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+
+      app-icon {
+        flex-shrink: 0;
+        color: var(--color-brass);
+        transition: transform $duration $ease-out;
+      }
+    }
+
+    &[open] summary app-icon {
+      transform: rotate(180deg);
+    }
+
+    p {
+      padding-bottom: $space-5;
+      max-width: 68ch;
+      line-height: 1.7;
+      color: var(--color-text-muted);
+    }
+  }
+}
+
+// --- Contact ------------------------------------------------------------------------
+.contact {
+  display: grid;
+  gap: $space-7;
+  scroll-margin-top: var(--navbar-height);
+
+  @include up(lg) {
+    grid-template-columns: 1fr 1.05fr;
+    align-items: start;
+    gap: $space-8;
+  }
+
+  &__info {
+    display: grid;
+    gap: $space-4;
+  }
+
+  &__lead {
+    line-height: 1.7;
+    color: rgba(231, 237, 245, 0.75);
+  }
+
+  &__list {
+    display: grid;
+    gap: $space-4;
+    margin-top: $space-3;
+
+    @include up(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    li {
+      display: flex;
+      gap: $space-3;
+    }
+
+    app-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+      color: var(--color-brass-light);
+    }
+
+    div {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    span {
+      font-size: $fs-xs;
+      letter-spacing: 0.06em;
+      color: rgba(231, 237, 245, 0.55);
+    }
+
+    a,
+    p {
+      font-weight: 600;
+      color: #fff;
+      overflow-wrap: anywhere;
+    }
+
+    a:hover {
+      color: var(--color-brass-light);
+    }
+  }
+
+  &__company {
+    margin-top: $space-3;
+    font-size: $fs-xs;
+    color: rgba(231, 237, 245, 0.5);
+  }
+
+  &__form-card {
+    @include card;
+    padding: $space-5;
+    color: var(--color-text);
+    box-shadow: var(--shadow-lg);
+
+    @include up(md) {
+      padding: $space-7;
+    }
+
+    form {
+      display: grid;
+      gap: $space-5;
+    }
+  }
+
+  &__success {
+    display: grid;
+    justify-items: center;
+    gap: $space-4;
+    padding: $space-6 0;
+    text-align: center;
+
+    p {
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__success-icon {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--color-success-soft);
+    color: var(--color-success);
+  }
+}

@@ -1,0 +1,277 @@
+<section class="page-header">
+  <div class="page-header__bg" aria-hidden="true">
+    <img [src]="config.imagery.about" alt="" />
+  </div>
+  <div class="container page-header__inner">
+    <nav class="breadcrumbs" aria-label="Omrvinková navigácia">
+      <a routerLink="/">Domov</a><span aria-hidden="true">/</span><span>Ako to funguje</span>
+    </nav>
+    <h1>Ako to funguje</h1>
+    <p class="lead">
+      Či ste skúsený skiper, alebo na palube jachty budete prvýkrát – prevedieme vás celým procesom od výberu lode až po
+      vrátenie kaucie.
+    </p>
+  </div>
+</section>
+
+<!-- ============ BOOKING STEPS ============ -->
+<section class="section">
+  <div class="container">
+    <header class="section-head section-head--split">
+      <div>
+        <span class="eyebrow">Rezervácia krok za krokom</span>
+        <h2>Ako si prenajať jachtu</h2>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Typ posádky">
+        <button
+          type="button"
+          role="tab"
+          id="tab-licensed"
+          aria-controls="steps-panel"
+          [attr.aria-selected]="audience() === 'licensed'"
+          (click)="audience.set('licensed')"
+        >
+          <app-icon name="wheel" [size]="18" /> Mám kapitánsky preukaz
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-first"
+          aria-controls="steps-panel"
+          [attr.aria-selected]="audience() === 'first'"
+          (click)="audience.set('first')"
+        >
+          <app-icon name="sparkle" [size]="18" /> Plavím sa prvýkrát
+        </button>
+      </div>
+    </header>
+
+    <ol
+      class="steps"
+      id="steps-panel"
+      role="tabpanel"
+      [attr.aria-labelledby]="audience() === 'licensed' ? 'tab-licensed' : 'tab-first'"
+    >
+      @for (s of steps(); track s.title; let i = $index) {
+        <li class="steps__item fade-in" [style.animation-delay]="i * 60 + 'ms'">
+          <span class="steps__num tabular">{{ (i + 1).toString().padStart(2, '0') }}</span>
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.text }}</p>
+        </li>
+      }
+    </ol>
+  </div>
+</section>
+
+<!-- ============ LICENSE ============ -->
+<section class="section section--warm">
+  <div class="container license">
+    <div class="license__copy">
+      <span class="eyebrow">Licencie</span>
+      <h2>{{ config.licensing.title }}</h2>
+      <p class="lead">{{ config.licensing.summary }}</p>
+      <p class="license__note"><app-icon name="info" [size]="18" /> {{ config.licensing.note }}</p>
+    </div>
+    <div class="license__card">
+      <h3 class="h4">Akceptované preukazy</h3>
+      <ul class="check-list">
+        @for (item of config.licensing.accepted; track item) {
+          <li><app-icon name="check" [size]="16" /> {{ item }}</li>
+        }
+      </ul>
+      <a routerLink="/flotila" [queryParams]="{ charter_type: 's_kapitanom' }" class="link-arrow">
+        Nemáte preukaz? Lode s kapitánom <app-icon name="arrow-right" [size]="16" />
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEPOSIT & INSURANCE ============ -->
+<section class="section">
+  <div class="container">
+    <header class="section-head section-head--center">
+      <span class="eyebrow">Kaucia a poistenie</span>
+      <h2>Bez prekvapení pri check-ine</h2>
+      <p class="lead">Transparentne vysvetlíme každý poplatok ešte pred podpisom zmluvy.</p>
+    </header>
+
+    <ul role="list" class="money">
+      <li class="money__card">
+        <span class="money__icon"><app-icon name="euro" [size]="26" [stroke]="1.25" /></span>
+        <h3 class="h4">Vratná kaucia</h3>
+        <p>
+          Pri lodiach bez posádky sa skladá kartou pri prevzatí lode (zvyčajne 1 500 – 5 000 €). Po bezproblémovom
+          odovzdaní sa uvoľní do niekoľkých dní.
+        </p>
+      </li>
+      <li class="money__card money__card--accent">
+        <span class="money__icon"><app-icon name="shield" [size]="26" [stroke]="1.25" /></span>
+        <h3 class="h4">100 % poistenie kaucie</h3>
+        <p>
+          Za cca 25 – 35 € na osobu a týždeň vám poistenie preplatí stratenú kauciu. Pri škode platíte len malú
+          spoluúčasť – plavba bez stresu.
+        </p>
+      </li>
+      <li class="money__card">
+        <span class="money__icon"><app-icon name="lifebuoy" [size]="26" [stroke]="1.25" /></span>
+        <h3 class="h4">Poistenie lode a posádky</h3>
+        <p>
+          Každá loď v našej ponuke má havarijné poistenie a poistenie zodpovednosti. Odporúčame aj cestovné poistenie so
+          stornom.
+        </p>
+      </li>
+    </ul>
+
+    <div class="faq">
+      <h3 class="faq__title">Časté otázky</h3>
+      @for (item of faq; track item.question) {
+        <details class="faq__item">
+          <summary>
+            {{ item.question }}
+            <app-icon name="chevron-down" [size]="18" />
+          </summary>
+          <p>{{ item.answer }}</p>
+        </details>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="section section--navy" id="kontakt">
+  <div class="container contact">
+    <div class="contact__info">
+      <span class="eyebrow eyebrow--light">Kontakt</span>
+      <h2>Sme tu pre vás na pevnine aj na mori</h2>
+      <p class="contact__lead">
+        Navštívte nás v kancelárii v Bratislave, zavolajte na charter desk alebo napíšte. Odpovedáme do 24 hodín, v sezóne
+        aj cez víkend.
+      </p>
+
+      <ul role="list" class="contact__list">
+        <li>
+          <app-icon name="phone" [size]="20" />
+          <div>
+            <span>Charter desk</span>
+            <a [href]="config.contact.phoneHref" class="tabular">{{ config.contact.phone }}</a>
+          </div>
+        </li>
+        <li>
+          <app-icon name="lifebuoy" [size]="20" />
+          <div>
+            <span>{{ config.contact.hotlineNote }}</span>
+            <a [href]="config.contact.hotlineHref" class="tabular">{{ config.contact.hotline }}</a>
+          </div>
+        </li>
+        <li>
+          <app-icon name="mail" [size]="20" />
+          <div>
+            <span>E-mail</span>
+            <a [href]="'mailto:' + config.contact.email">{{ config.contact.email }}</a>
+          </div>
+        </li>
+        <li>
+          <app-icon name="sparkle" [size]="20" />
+          <div>
+            <span>VIP charter desk – superjachty</span>
+            <a [href]="'mailto:' + config.contact.vipEmail">{{ config.contact.vipEmail }}</a>
+          </div>
+        </li>
+        <li>
+          <app-icon name="pin" [size]="20" />
+          <div>
+            <span>Kancelária</span>
+            <a [href]="config.contact.mapUrl" target="_blank" rel="noopener">
+              {{ config.contact.address.street }}, {{ config.contact.address.zip }} {{ config.contact.address.city }}
+            </a>
+          </div>
+        </li>
+        <li>
+          <app-icon name="clock" [size]="20" />
+          <div>
+            <span>Otváracie hodiny</span>
+            <p>{{ config.contact.openingHours }}</p>
+          </div>
+        </li>
+      </ul>
+
+      <p class="contact__company">
+        {{ config.company.legalName }} · IČO <span class="tabular">{{ config.company.ico }}</span> · DIČ
+        <span class="tabular">{{ config.company.dic }}</span>
+      </p>
+    </div>
+
+    <div class="contact__form-card">
+      @if (submitted()) {
+        <div class="contact__success" role="status">
+          <span class="contact__success-icon"><app-icon name="check-circle" [size]="36" /></span>
+          <h3 class="h4">Správa odoslaná</h3>
+          <p>Ďakujeme. Ozveme sa vám najneskôr do 24 hodín.</p>
+          <button type="button" class="btn btn--outline" (click)="reset()">Napísať ďalšiu správu</button>
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <h3 class="h4">Napíšte nám</h3>
+          <div class="form-grid">
+            <div class="field field--full">
+              <label class="field__label" for="ct-name">Meno a priezvisko</label>
+              <input id="ct-name" class="input" autocomplete="name" formControlName="client_name" />
+              @if (fieldError('client_name'); as err) {
+                <span class="field__error">{{ err }}</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field__label" for="ct-email">E-mail</label>
+              <input id="ct-email" class="input" type="email" autocomplete="email" formControlName="email" />
+              @if (fieldError('email'); as err) {
+                <span class="field__error">{{ err }}</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field__label" for="ct-phone">Telefón <small>(nepovinné)</small></label>
+              <input id="ct-phone" class="input" type="tel" autocomplete="tel" formControlName="phone" />
+              @if (fieldError('phone'); as err) {
+                <span class="field__error">{{ err }}</span>
+              }
+            </div>
+            <div class="field field--full">
+              <label class="field__label" for="ct-subject">Predmet</label>
+              <select id="ct-subject" class="select" formControlName="subject">
+                @for (s of subjects; track s) {
+                  <option [value]="s">{{ s }}</option>
+                }
+              </select>
+            </div>
+            <div class="field field--full">
+              <label class="field__label" for="ct-message">Správa</label>
+              <textarea id="ct-message" class="textarea" rows="5" formControlName="message"></textarea>
+              @if (fieldError('message'); as err) {
+                <span class="field__error">{{ err }}</span>
+              }
+            </div>
+          </div>
+
+          <label class="check">
+            <input type="checkbox" formControlName="consent" />
+            <span>Súhlasím so spracovaním osobných údajov za účelom vybavenia správy.</span>
+          </label>
+          @if (fieldError('consent'); as err) {
+            <span class="field__error">{{ err }}</span>
+          }
+
+          @if (serverError(); as err) {
+            <div class="form-alert form-alert--error" role="alert"><app-icon name="alert" [size]="18" /> {{ err }}</div>
+          }
+
+          <button type="submit" class="btn btn--brass btn--lg btn--block" [disabled]="submitting()">
+            @if (submitting()) {
+              <span class="spinner"></span> Odosielam…
+            } @else {
+              Odoslať správu
+            }
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+</section>
