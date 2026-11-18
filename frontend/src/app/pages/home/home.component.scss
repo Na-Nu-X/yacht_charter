@@ -117,7 +117,8 @@
   }
 
   @include up(lg) {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    // Weighted by the longest option label in each select.
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.2fr) minmax(0, 1.1fr) minmax(0, 0.75fr) auto;
     align-items: stretch;
   }
 
@@ -160,8 +161,9 @@
     border: 0;
     background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath stroke='%23475569' stroke-width='1.6' d='m1 1.5 5 5 5-5'/%3E%3C/svg%3E") no-repeat right center;
     appearance: none;
-    font-size: $fs-base;
+    font-size: 0.9375rem;
     font-weight: 600;
+    text-overflow: ellipsis;
     color: var(--color-text);
     cursor: pointer;
 
