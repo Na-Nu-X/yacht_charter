@@ -1,0 +1,432 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.header-actions {
+  margin-top: $space-3;
+}
+
+// --- Segments ------------------------------------------------------------------
+.segments {
+  display: grid;
+  gap: $space-5;
+
+  @include up(lg) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.segment {
+  display: flex;
+  gap: $space-4;
+  align-items: flex-start;
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--color-brass);
+    border-radius: 50%;
+    color: var(--color-brass);
+  }
+
+  div {
+    display: grid;
+    gap: $space-2;
+  }
+
+  p {
+    font-size: $fs-sm;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+}
+
+// --- Layout ----------------------------------------------------------------------
+.planner {
+  display: grid;
+  gap: $space-7;
+
+  @include up(lg) {
+    grid-template-columns: 340px minmax(0, 1fr);
+    align-items: start;
+    gap: $space-8;
+  }
+
+  &__aside {
+    display: grid;
+    gap: $space-4;
+
+    @include up(lg) {
+      position: sticky;
+      top: calc(var(--navbar-height) + $space-5);
+    }
+  }
+}
+
+.timeline {
+  display: grid;
+  gap: 0;
+  margin: $space-2 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding: 0 0 $space-5 $space-6;
+    border-left: 1px solid var(--color-border-strong);
+    margin-left: 6px;
+
+    &:last-child {
+      border-left-color: transparent;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -7px;
+      top: 2px;
+      width: 13px;
+      height: 13px;
+      border: 2px solid var(--color-brass);
+      border-radius: 50%;
+      background: var(--color-bg);
+    }
+  }
+
+  strong {
+    font-size: $fs-sm;
+  }
+
+  span {
+    font-size: $fs-sm;
+    color: var(--color-text-muted);
+  }
+}
+
+.broker-card {
+  display: flex;
+  gap: $space-3;
+  padding: $space-4 $space-5;
+  border-radius: var(--radius-lg);
+  background: var(--color-navy-deep);
+  color: #fff;
+
+  app-icon {
+    color: var(--color-brass-light);
+    margin-top: 2px;
+  }
+
+  div {
+    display: grid;
+    gap: 2px;
+  }
+
+  span {
+    @include eyebrow(var(--color-brass-light));
+    font-size: 0.65rem;
+  }
+
+  a {
+    font-weight: 600;
+  }
+}
+
+// --- Wizard ----------------------------------------------------------------------
+.wizard {
+  @include card;
+  box-shadow: var(--shadow);
+  padding: $space-5;
+  scroll-margin-top: calc(var(--navbar-height) + $space-4);
+
+  @include up(md) {
+    padding: $space-7;
+  }
+
+  &__form {
+    display: grid;
+    gap: $space-6;
+  }
+
+  &__nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $space-3;
+    padding-top: $space-5;
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+.progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 0 $space-6;
+  padding: 0;
+  list-style: none;
+
+  li {
+    position: relative;
+
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 17px;
+      left: calc(50% + 24px);
+      right: calc(-50% + 24px);
+      height: 1px;
+      background: var(--color-border-strong);
+    }
+
+    &.is-done::after {
+      background: var(--color-brass);
+    }
+  }
+
+  button {
+    display: grid;
+    justify-items: center;
+    gap: $space-2;
+    width: 100%;
+  }
+
+  &__dot {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 50%;
+    background: var(--color-surface);
+    font-size: $fs-sm;
+    font-weight: 700;
+    color: var(--color-text-subtle);
+    transition: all $duration;
+  }
+
+  &__label {
+    font-size: $fs-xs;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-subtle);
+  }
+
+  .is-active &__dot {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: #fff;
+  }
+
+  .is-active &__label {
+    color: var(--color-text);
+  }
+
+  .is-done &__dot {
+    border-color: var(--color-brass);
+    background: var(--color-brass);
+    color: #fff;
+  }
+}
+
+.step {
+  display: grid;
+  gap: $space-5;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+
+  &__title {
+    margin-bottom: $space-2;
+    padding: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    line-height: 1.15;
+  }
+
+  &__row {
+    display: grid;
+    gap: $space-4;
+
+    @include up(sm) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+}
+
+.choices {
+  display: grid;
+  gap: $space-3;
+
+  @include up(sm) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @include up(xl) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  &--icons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    @include up(md) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    @include up(xl) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .choice {
+      justify-items: center;
+      text-align: center;
+      padding-block: $space-5;
+    }
+  }
+}
+
+.choice {
+  display: grid;
+  gap: 4px;
+  align-content: start;
+  padding: $space-4;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  text-align: left;
+  transition: all $duration $ease-out;
+
+  app-icon {
+    margin-bottom: $space-2;
+    color: var(--color-brass);
+  }
+
+  strong {
+    font-size: $fs-sm;
+  }
+
+  small {
+    font-size: $fs-xs;
+    color: var(--color-text-subtle);
+  }
+
+  &:hover {
+    border-color: var(--color-accent);
+  }
+
+  &[aria-checked='true'] {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: #fff;
+    box-shadow: var(--shadow);
+
+    small {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    app-icon {
+      color: var(--color-brass-light);
+    }
+  }
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 48px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 46px;
+    color: var(--color-accent);
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      background: var(--color-bg);
+    }
+  }
+
+  output {
+    font-weight: 600;
+  }
+}
+
+// --- Confirmation ------------------------------------------------------------------
+.confirmation {
+  display: grid;
+  justify-items: center;
+  gap: $space-4;
+  text-align: center;
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--color-success-soft);
+    color: var(--color-success);
+  }
+
+  p {
+    max-width: 48ch;
+    color: var(--color-text-muted);
+  }
+
+  &__summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    margin: $space-3 0;
+    border-radius: var(--radius);
+    background: var(--color-surface-warm);
+    text-align: left;
+
+    @include up(md) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    div {
+      display: grid;
+      gap: 2px;
+      padding: $space-4;
+    }
+
+    dt {
+      @include eyebrow(var(--color-text-subtle));
+      font-size: 0.65rem;
+    }
+
+    dd {
+      margin: 0;
+      font-weight: 600;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $space-3;
+  }
+}

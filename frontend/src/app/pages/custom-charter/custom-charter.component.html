@@ -1,0 +1,315 @@
+<section class="page-header">
+  <div class="page-header__bg" aria-hidden="true">
+    <img [src]="config.imagery.customCharter" alt="" />
+  </div>
+  <div class="container page-header__inner">
+    <nav class="breadcrumbs" aria-label="Omrvinková navigácia">
+      <a routerLink="/">Domov</a><span aria-hidden="true">/</span><span>Plavba na mieru</span>
+    </nav>
+    <h1>Plavba <em class="serif-italic">na mieru</em></h1>
+    <p class="lead">
+      Odpovedzte na pár otázok a náš charterový broker vám do 24 hodín pripraví 2 – 3 ponuky lodí s trasou a presnou
+      cenou. Bezplatne a nezáväzne.
+    </p>
+    <div class="header-actions">
+      <a class="btn btn--brass btn--lg" routerLink="." fragment="formular">Začať plánovať</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight section--warm">
+  <div class="container">
+    <ul role="list" class="segments">
+      @for (s of segments; track s.title) {
+        <li class="segment">
+          <span class="segment__icon"><app-icon [name]="s.icon" [size]="26" [stroke]="1.25" /></span>
+          <div>
+            <h2 class="h4">{{ s.title }}</h2>
+            <p>{{ s.text }}</p>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+</section>
+
+<section class="section" id="formular">
+  <div class="container planner">
+    <aside class="planner__aside">
+      <span class="eyebrow">Ako to prebieha</span>
+      <h2 class="h3">Od dopytu k vyplávaniu</h2>
+      <ol class="timeline">
+        <li>
+          <strong>Dnes</strong>
+          <span>Vyplníte krátky dotazník – zaberie to 2 minúty.</span>
+        </li>
+        <li>
+          <strong>Do 24 hodín</strong>
+          <span>Broker vám zavolá a doladí detaily, potom pošle ponuky lodí a trasy.</span>
+        </li>
+        <li>
+          <strong>Rezervácia</strong>
+          <span>Vyberiete si loď, podpíšeme zmluvu a uhradíte zálohu.</span>
+        </li>
+        <li>
+          <strong>Deň D</strong>
+          <span>Check-in v maríne, uvítací drink a hor sa na more.</span>
+        </li>
+      </ol>
+
+      <div class="broker-card">
+        <app-icon name="phone" [size]="20" />
+        <div>
+          <span>Charter desk</span>
+          <a [href]="config.contact.phoneHref" class="tabular">{{ config.contact.phone }}</a>
+          <a [href]="'mailto:' + config.contact.vipEmail">{{ config.contact.vipEmail }}</a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="wizard" #wizardTop>
+      @if (submitted()) {
+        <div class="confirmation fade-in" role="status">
+          <span class="confirmation__icon"><app-icon name="check-circle" [size]="40" /></span>
+          <span class="eyebrow eyebrow--plain">Požiadavka odoslaná</span>
+          <h2 class="h3">Ďakujeme, už plánujeme vašu plavbu</h2>
+          <p>
+            Váš osobný broker sa vám ozve do 24 hodín telefonicky alebo na <strong>{{ summary().email }}</strong>.
+          </p>
+          <dl class="confirmation__summary">
+            <div><dt>Destinácia</dt><dd>{{ summary().destination }}</dd></div>
+            <div><dt>Termín</dt><dd>{{ summary().month }}</dd></div>
+            <div><dt>Typ lode</dt><dd>{{ summary().yacht }}</dd></div>
+            <div><dt>Posádka</dt><dd>{{ summary().charter }}</dd></div>
+            <div><dt>Hostia</dt><dd class="tabular">{{ summary().guests }}</dd></div>
+            <div><dt>Rozpočet</dt><dd>{{ summary().budget }}</dd></div>
+          </dl>
+          <div class="confirmation__actions">
+            <a class="btn btn--brass" routerLink="/flotila">Prezrieť flotilu</a>
+            <button type="button" class="btn btn--ghost" (click)="restart()">Nová požiadavka</button>
+          </div>
+        </div>
+      } @else {
+        <ol class="progress" aria-label="Kroky formulára">
+          @for (label of steps; track label; let i = $index) {
+            <li [class.is-active]="i === step()" [class.is-done]="i < step()">
+              <button type="button" (click)="goTo(i)" [attr.aria-current]="i === step() ? 'step' : null">
+                <span class="progress__dot">
+                  @if (i < step()) {
+                    <app-icon name="check" [size]="14" [stroke]="2.2" />
+                  } @else {
+                    {{ i + 1 }}
+                  }
+                </span>
+                <span class="progress__label">{{ label }}</span>
+              </button>
+            </li>
+          }
+        </ol>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="wizard__form">
+          @switch (step()) {
+            @case (0) {
+              <fieldset class="step fade-in">
+                <legend class="step__title">Kam by ste sa radi plavili?</legend>
+                <div class="choices" role="radiogroup" aria-label="Destinácia">
+                  @for (c of destinationChoices(); track c.value) {
+                    <button
+                      type="button"
+                      role="radio"
+                      class="choice"
+                      [attr.aria-checked]="isChosen('preferred_destination', c.value)"
+                      (click)="setValue('preferred_destination', c.value)"
+                    >
+                      <strong>{{ c.label }}</strong>
+                      @if (c.hint) {
+                        <small>{{ c.hint }}</small>
+                      }
+                    </button>
+                  }
+                </div>
+                @if (fieldError('preferred_destination'); as err) {
+                  <span class="field__error">{{ err }}</span>
+                }
+
+                <div class="field">
+                  <label class="field__label" for="cc-month">Preferovaný mesiac</label>
+                  <select id="cc-month" class="select" formControlName="preferred_month">
+                    <option value="" disabled>Vyberte termín</option>
+                    @for (m of months; track m) {
+                      <option [value]="m">{{ m }}</option>
+                    }
+                  </select>
+                  @if (fieldError('preferred_month'); as err) {
+                    <span class="field__error">{{ err }}</span>
+                  }
+                </div>
+              </fieldset>
+            }
+
+            @case (1) {
+              <fieldset class="step fade-in">
+                <legend class="step__title">Aká loď a posádka?</legend>
+
+                <div class="choices choices--icons" role="radiogroup" aria-label="Typ lode">
+                  @for (c of yachtTypeChoices; track c.value) {
+                    <button
+                      type="button"
+                      role="radio"
+                      class="choice"
+                      [attr.aria-checked]="isChosen('yacht_type', c.value)"
+                      (click)="setValue('yacht_type', c.value)"
+                    >
+                      @if (c.icon) {
+                        <app-icon [name]="c.icon" [size]="24" [stroke]="1.25" />
+                      }
+                      <strong>{{ c.label }}</strong>
+                      <small>{{ c.hint }}</small>
+                    </button>
+                  }
+                </div>
+
+                <div class="field">
+                  <span class="field__label" id="cc-charter-label">Typ prenájmu</span>
+                  <div class="pills" role="radiogroup" aria-labelledby="cc-charter-label">
+                    @for (c of charterTypeChoices; track c.value) {
+                      <button
+                        type="button"
+                        role="radio"
+                        class="chip"
+                        [attr.aria-checked]="isChosen('charter_type', c.value)"
+                        [class.is-active]="isChosen('charter_type', c.value)"
+                        (click)="setValue('charter_type', c.value)"
+                      >
+                        {{ c.label }}
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <div class="step__row">
+                  <div class="field">
+                    <span class="field__label" id="cc-guests-label">Počet hostí</span>
+                    <div class="stepper" role="group" aria-labelledby="cc-guests-label">
+                      <button type="button" (click)="changeGuests(-1)" aria-label="Menej hostí" [disabled]="form.controls.guests_count.value <= 1">
+                        <app-icon name="minus" [size]="18" />
+                      </button>
+                      <output class="tabular" aria-live="polite">
+                        {{ form.controls.guests_count.value }} {{ form.controls.guests_count.value | plural: plurals.person }}
+                      </output>
+                      <button type="button" (click)="changeGuests(1)" aria-label="Viac hostí" [disabled]="form.controls.guests_count.value >= 40">
+                        <app-icon name="plus" [size]="18" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="field">
+                    <label class="field__label" for="cc-budget">Rozpočet na týždeň</label>
+                    <select id="cc-budget" class="select" formControlName="estimated_weekly_budget">
+                      <option value="" disabled>Vyberte rozpočet</option>
+                      @for (b of budgetChoices; track b) {
+                        <option [value]="b">{{ b }}</option>
+                      }
+                    </select>
+                    @if (fieldError('estimated_weekly_budget'); as err) {
+                      <span class="field__error">{{ err }}</span>
+                    }
+                  </div>
+                </div>
+              </fieldset>
+            }
+
+            @case (2) {
+              <fieldset class="step fade-in">
+                <legend class="step__title">Pri akej príležitosti?</legend>
+                <div class="pills" role="group" aria-label="Príležitosť">
+                  @for (o of occasions; track o.value) {
+                    <button type="button" class="chip" [attr.aria-pressed]="hasOccasion(o.value)" (click)="toggleOccasion(o.value)">
+                      @if (o.icon) {
+                        <app-icon [name]="o.icon" [size]="16" />
+                      }
+                      {{ o.label }}
+                    </button>
+                  }
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="cc-notes">Špeciálne želania <small>(nepovinné)</small></label>
+                  <textarea
+                    id="cc-notes"
+                    class="textarea"
+                    rows="3"
+                    formControlName="notes"
+                    placeholder="Napr. oslava 40. narodenín, vegetariánska strava, transfer z letiska Split…"
+                  ></textarea>
+                </div>
+
+                <div class="form-grid">
+                  <div class="field field--full">
+                    <label class="field__label" for="cc-name">Meno a priezvisko</label>
+                    <input id="cc-name" class="input" autocomplete="name" formControlName="client_name" />
+                    @if (fieldError('client_name'); as err) {
+                      <span class="field__error">{{ err }}</span>
+                    }
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="cc-phone">Telefón</label>
+                    <input id="cc-phone" class="input" type="tel" autocomplete="tel" placeholder="+421 900 123 456" formControlName="phone" />
+                    @if (fieldError('phone'); as err) {
+                      <span class="field__error">{{ err }}</span>
+                    }
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="cc-email">E-mail</label>
+                    <input id="cc-email" class="input" type="email" autocomplete="email" formControlName="email" />
+                    @if (fieldError('email'); as err) {
+                      <span class="field__error">{{ err }}</span>
+                    }
+                  </div>
+                </div>
+
+                <label class="check">
+                  <input type="checkbox" formControlName="consent" />
+                  <span>Súhlasím so spracovaním osobných údajov za účelom prípravy ponuky (GDPR).</span>
+                </label>
+                @if (fieldError('consent'); as err) {
+                  <span class="field__error">{{ err }}</span>
+                }
+
+                @if (serverError(); as err) {
+                  <div class="form-alert form-alert--error" role="alert">
+                    <app-icon name="alert" [size]="18" /> {{ err }}
+                  </div>
+                }
+              </fieldset>
+            }
+          }
+
+          <div class="wizard__nav">
+            @if (step() > 0) {
+              <button type="button" class="btn btn--ghost" (click)="back()">
+                <app-icon name="arrow-left" [size]="16" /> Späť
+              </button>
+            } @else {
+              <span></span>
+            }
+
+            @if (step() < 2) {
+              <button type="button" class="btn btn--outline" (click)="next()">
+                Pokračovať <app-icon name="arrow-right" [size]="16" />
+              </button>
+            } @else {
+              <button type="submit" class="btn btn--brass btn--lg" [disabled]="submitting()">
+                @if (submitting()) {
+                  <span class="spinner"></span> Odosielam…
+                } @else {
+                  Odoslať požiadavku
+                }
+              </button>
+            }
+          </div>
+        </form>
+      }
+    </div>
+  </div>
+</section>
